@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum PostStatus {
+  SUGGESTION
+  PLANNED
+  IN_PROGRESS
+  RELEASED
+}
+
+model User {
+  id           String         @id
+  email        String         @unique
+  name         String?
+  image        String?
+  role         Role           @default(USER)
+  workspaces   Workspace[]    @relation("WorkspaceOwner")
+  feedbackPosts FeedbackPost[]
+  votes        Vote[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Workspace {
+  id           String         @id @default(uuid())
+  name         String
+  slug         String         @unique
+  logo         String?
+  description  String?
+  ownerId      String
+  owner        User           @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  posts        FeedbackPost[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model FeedbackPost {
+  id           String       @id @default(uuid())
+  title        String
+  description  String
+  status       PostStatus   @default(SUGGESTION)
+  isPinned     Boolean      @default(false)
+  workspaceId  String
+  workspace    Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  votes        Vote[]
+  voteCount    Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([workspaceId])
+  @@index([status])
+  @@index([voteCount, createdAt])
+}
+
+model Vote {
+  id        String       @id @default(uuid())
+  postId    String
+  post      FeedbackPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([postId, userId])
+  @@index([userId])
+  @@index([postId])
+}
