@@ -1,7 +1,17 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
 const prismaClientSingleton = () => {
-  return new PrismaClient();
+  // Fallback to avoid crashes during local or build-time compilation
+  const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/featloop?schema=public';
+  
+  const pool = new pg.Pool({ 
+    connectionString,
+    // Add connection limits/timeouts if necessary
+  });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter });
 };
 
 declare global {

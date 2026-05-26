@@ -11,9 +11,14 @@ interface SettingsFormProps {
   initialDescription: string | null;
 }
 
-const initialState = {
-  error: '',
-  success: '',
+interface ActionState {
+  error?: string;
+  success?: string;
+}
+
+const initialState: ActionState = {
+  error: undefined,
+  success: undefined,
 };
 
 export default function SettingsForm({

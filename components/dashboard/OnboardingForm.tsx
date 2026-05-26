@@ -4,8 +4,12 @@ import React, { useActionState, useState } from 'react';
 import { createWorkspace } from '@/app/dashboard/actions';
 import { Loader2 } from 'lucide-react';
 
-const initialState = {
-  error: '',
+interface ActionState {
+  error?: string;
+}
+
+const initialState: ActionState = {
+  error: undefined,
 };
 
 export default function OnboardingForm() {

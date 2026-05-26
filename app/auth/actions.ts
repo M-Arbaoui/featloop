@@ -9,7 +9,7 @@ export async function login(formData: FormData) {
   const password = formData.get('password') as string;
   
   if (!email || !password) {
-    return { error: 'Email and password are required' };
+    redirect('/login?error=' + encodeURIComponent('Email and password are required'));
   }
 
   const supabase = await createClient();
@@ -20,7 +20,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    redirect('/login?error=' + encodeURIComponent(error.message));
   }
 
   if (data?.user) {
@@ -52,7 +52,7 @@ export async function signup(formData: FormData) {
   const name = formData.get('name') as string;
 
   if (!email || !password) {
-    return { error: 'Email and password are required' };
+    redirect('/signup?error=' + encodeURIComponent('Email and password are required'));
   }
 
   const supabase = await createClient();
@@ -68,7 +68,7 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    redirect('/signup?error=' + encodeURIComponent(error.message));
   }
 
   if (data?.user) {
@@ -93,11 +93,11 @@ export async function signup(formData: FormData) {
       redirect('/dashboard');
     } else {
       // If email verification is on, they must confirm their email first
-      return { success: 'Check your email for the confirmation link to complete registration.' };
+      redirect('/login?message=' + encodeURIComponent('Check your email for the confirmation link to complete registration.'));
     }
   }
 
-  return { error: 'Something went wrong.' };
+  redirect('/signup?error=' + encodeURIComponent('Something went wrong.'));
 }
 
 export async function signout() {

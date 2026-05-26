@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import db from '@/lib/db';
 import { notFound } from 'next/navigation';
-import { Terminal, Copy } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import React from 'react';
 
 interface WidgetDashboardPageProps {
